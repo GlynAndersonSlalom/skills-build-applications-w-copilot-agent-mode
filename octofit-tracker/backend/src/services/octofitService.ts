@@ -1,6 +1,8 @@
 import { isObjectIdOrHexString } from 'mongoose';
 import { Activity, Team, User, Workout } from '../models/index.js';
 
+const RECENT_ACTIVITY_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
 export async function listActivities() {
   return Activity.find().lean();
 }
@@ -64,7 +66,7 @@ export async function suggestWorkouts(userEmail: string) {
     throw Object.assign(new Error('User not found'), { status: 404 });
   }
   const [pattern] = await Activity.aggregate<{ _id: string; totalMinutes: number }>([
-    { $match: { user: user._id } },
+    { $match: { user: user._id, occurredAt: { $gte: new Date(Date.now() - RECENT_ACTIVITY_WINDOW_MS) } } },
     { $group: { _id: '$type', totalMinutes: { $sum: '$minutes' } } },
     { $sort: { totalMinutes: -1, _id: 1 } },
     { $limit: 1 },
