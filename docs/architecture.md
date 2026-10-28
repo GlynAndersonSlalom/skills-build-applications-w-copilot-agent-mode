@@ -30,13 +30,13 @@ OctoFit Tracker is a three-tier application for a school fitness program. The st
 
 Record your plan here before editing code.
 
-- Data tier: make the Mongoose models enforce the required fields and relationships in the contracts. Preserve the seed script's non-destructive, idempotent behavior; its contract currently passes.
-- Logic tier: keep route handlers thin and implement validation and persistence in the service layer. Return deliberate 4xx responses for invalid or unknown references instead of exposing cast errors or 500s.
-- Presentation tier: keep API requests and loading, success, empty, and error states in the React routes/components, using the shared API client and relative `/api` paths.
-- Activity tracking: validate the submitted user and team IDs and confirm both records exist; persist the submitted activity fields with computed points and an occurrence date.
-- Team management: reject a missing name and preserve submitted name, mascot, and members on create/list.
-- Leaderboard: aggregate activity points by team, sort highest first, and assign 1-based ranks.
-- Workout suggestions: find the requested user, use their goal or recent activity to choose the first suggestion, explain the match, and return a deliberate 4xx for an unknown email.
+- Presentation tier decision: keep API requests and loading, success, empty, and error states in the React routes/components, using the shared API client and relative `/api` paths.
+- Logic tier decision: keep route handlers thin and implement validation and persistence in the service layer. Return deliberate 4xx responses for invalid or unknown references instead of exposing cast errors or 500s.
+- Data tier decision: make the Mongoose models enforce the required fields and relationships in the contracts. Preserve the seed script's non-destructive, idempotent behavior; its contract currently passes.
+- Activity tracking approach: validate the submitted user and team IDs and confirm both records exist; persist the submitted activity fields with computed points and an occurrence date.
+- Team management approach: reject a missing name and preserve submitted name, mascot, and members on create/list.
+- Leaderboard approach: aggregate activity points by team, sort highest first, and assign 1-based ranks.
+- Workout suggestions approach: find the requested user, use their goal or recent activity to choose the first suggestion, explain the match, and return a deliberate 4xx for an unknown email.
 
 Implement and verify in dependency order: models and data contract, API service behavior and API contract, then presentation components and frontend contract. Finish with both tier build commands below.
 
