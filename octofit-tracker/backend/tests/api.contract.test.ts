@@ -103,4 +103,31 @@ describe('OctoFit API contract', () => {
     expect(unknownResponse.status).toBeGreaterThanOrEqual(400);
     expect(unknownResponse.status).toBeLessThan(500);
   });
+
+  it('ignores activity older than 30 days and falls back to the fitness goal', async () => {
+    const { user, team } = await createUserAndTeam('Mona', 'mona@example.com', 'Mona');
+    await User.updateOne({ _id: user._id }, { $set: { fitnessGoal: 'strength' } });
+    await Activity.create({
+      user: user._id,
+      team: team._id,
+      type: 'run',
+      minutes: 120,
+      points: 120,
+      occurredAt: new Date(Date.now() - 31 * 24 * 60 * 60 * 1000),
+    });
+    await Workout.create([
+      { title: 'Intervals', focus: 'endurance', minutes: 30, difficulty: 'moderate' },
+      { title: 'Strength Circuit', focus: 'strength', minutes: 30, difficulty: 'moderate' },
+    ]);
+
+    const response = await request(app).get('/api/workouts/suggestions/mona%40example.com');
+
+    expect(response.status).toBe(200);
+    expect(response.body.suggestions).toHaveLength(1);
+    expect(response.body.suggestions[0]).toMatchObject({
+      title: 'Strength Circuit',
+      focus: 'strength',
+      reason: expect.stringMatching(/fitness goal/i),
+    });
+  });
 });
