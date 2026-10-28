@@ -39,6 +39,11 @@ export async function createTeam(input: unknown) {
   if (error) {
     throw Object.assign(error, { status: 400 });
   }
+  const memberIds = [...new Set(team.members.map((member) => member.toString()))];
+  const memberCount = await User.countDocuments({ _id: { $in: memberIds } });
+  if (memberCount !== memberIds.length) {
+    throw Object.assign(new Error('One or more members were not found'), { status: 404 });
+  }
   return team.save();
 }
 
